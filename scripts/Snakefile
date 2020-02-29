@@ -1,0 +1,124 @@
+## Snakefile
+
+'''
+module load snakemake/5.2.2 (also loads anaconda and python3)
+snakemake -np TARGET
+
+__Tasks__
+1. setup project directory for rnaseq and download fastq files
+2. assess basic fastq parameters with fastqc and aggregate with multiqc
+3. prelim quantification with salmon
+4. if needed, trim adapters (not needed in this case per fastqc)
+5. star 2-pass alignment with batch-wide splice junction detection
+6. quantification with RSEM
+7. prepare counts with tximport
+8. explore counts with DESeq2/PCA
+9. differential expression with DESeq2
+'''
+
+from datetime import datetime
+
+## globals
+dt = '_'.join([str(datetime.now()).split(' ')[0], ''.join(str(datetime.now()).split(' ')[1].split('.')[0].split(':')[0:3])])
+
+rule setup_rnaseq:
+    input:
+        sh = 'setup.sh'
+    output:
+        'setup.flag'
+    shell:
+        'bash setup.sh'
+
+rule fqc_1:
+    input:
+        py = 'qc_fqc_1.py'
+    output:
+        'qc_fqc_1.flag'
+    shell:
+        'python {input.py} --batch_size 20 --test'
+
+rule mqc_1:
+    input:
+        py = 'qc_mqc_1.py'
+    output:
+        'qc_mqc_1.flag'
+    shell:
+        'python {input.py} --test'
+
+rule salmon_1:
+    input:
+        py = 'qc_salgc_1.py'
+    output:
+        'qc_salgc_1.flag'
+    shell:
+        'python {input.py} --batch_size 20 --test'
+
+rule star_align_1:
+    input:
+        py = 'star_align_p1.py'
+    output:
+        'star_align_p1.flag'
+    shell:
+        'python {input.py} --batch_size 5 --test'
+
+rule star_idx_2:  ## can change chrom number to specify different sub-projects
+    input:
+        sh = 'star_idx_p2.sh'
+    output:
+        'star_idx_p2_chrom20.out'
+    shell:
+        'sbatch --output=star_idx_p2_chrom20.out {input.sh} chrom20'
+
+rule star_align_2:
+    input:
+        py = 'star_align_p2.py'
+    output:
+        'star_align_p2.flag'
+    shell:
+        'python {input.py} --batch_size 5 --test'
+
+rule rsem_quant:  ## assumes rsem index prepared with setup_rsem.sh in caseylab-home
+    input:
+        py = 'rsem_quant.py'
+    output:
+        'rsem_quant.flag'
+    shell:
+        'python {input.py} --batch_size 5 --live'
+
+rule annotations:
+    input:
+        py = 'ann.py'
+    output:
+        'annotations.flag'
+    shell:
+        'python {input.py} --test'
+
+## positional arguments to count_prep.R are batch, cell line, drop parent, quant tool, molecular type, run type
+## valid entries for batch: chrom20, chrom9; for cell line: U87 (both batches), U118 (chrom9), LN229 (chrom20), none
+## valid entries for drop parent: prdp, prkp; for quant tool: sal, rsem; for molecular type: ge, tx; for run type test, live
+rule count_prep:
+    input:
+        sh = 'run_R.sh',
+        R = 'count_prep.R'
+    output:
+        'count_prep.flag'
+    shell:
+        'sbatch --output=count_prep_{dt}.out {input.sh} {input.R} chrom20 LN229 prdp rsem ge live'
+
+rule explore_counts:
+    input:
+        sh = 'run_R.sh',
+        R = 'explore_counts.R'
+    output:
+        'explore_counts.flag'
+    shell:
+        'sbatch --output=explore_counts_{dt}.out {input.sh} {input.R} chrom20 U87 prdp rsem ge live'
+
+rule diff_expr:
+    input:
+        sh = 'run_R.sh',
+        R = 'de.R'
+    output:
+        'de.flag'
+    shell:
+        'sbatch --output=diff_expr_{dt}.out {input.sh} {input.R} chrom20 LN229 prdp rsem ge live'
