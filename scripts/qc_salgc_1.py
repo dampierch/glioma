@@ -57,5 +57,5 @@ for batch in batches:
     else:
         os.mkdir(out_path)
     fileset = glob.glob(in_path+'*'+suff)
-    array_max = math.ceil((len(fileset)/2)/int(args.batch_size))
+    array_max = math.ceil(len(fileset)/int(args.batch_size))
     run_salmon(in_path,out_path,batch,int(args.batch_size),array_max,args.run_type)

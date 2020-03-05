@@ -261,14 +261,24 @@ plot_fgsea <- function(fgseaRes,design) {
 }
 
 
-plot_select <- function(dds,wald_res_rank,selection) {
+plot_select <- function(dds,wald_res_rank,selection,direction="any") {
   if (selection=="top") {
+    if (direction=="neg") {
+      wald_res_rank <- wald_res_rank[wald_res_rank$stat < 0 & !is.na(wald_res_rank$symbol),]
+      ggp_title <- "Expression Levels of Top Ranked Under-expressed Genes (padj)"
+    } else {
+      ggp_title <- "Expression Levels of Top Ranked Genes (padj)"
+    }
     select_ids <- head(rownames(wald_res_rank),6)
     names(select_ids) <- head(wald_res_rank$symbol,6)
-    ggp_title <- "Expression Levels of Top Ranked Genes by p-value"
   } else if (selection=="qpcr") {
-    select_ids <- c("ENSG00000258366", "ENSG00000026036", "ENSG00000125508", "ENSG00000101216", "ENSG00000197457", "ENSG00000101213", "ENSG00000101246", "ENSG00000125520", "ENSG00000203896")
-    names(select_ids) <- c("RTEL1", "RTEL1-TNFRSF6B", "SRMS", "GMEB2", "STMN3", "PTK6", "ARFRP1", "SLC2A4RG", "LIME1")
+    if (batch="chrom20") {
+      select_ids <- c("ENSG00000258366", "ENSG00000026036", "ENSG00000125508", "ENSG00000101216", "ENSG00000197457", "ENSG00000101213", "ENSG00000101246", "ENSG00000125520", "ENSG00000203896")
+      names(select_ids) <- c("RTEL1", "RTEL1-TNFRSF6B", "SRMS", "GMEB2", "STMN3", "PTK6", "ARFRP1", "SLC2A4RG", "LIME1")
+    } else if (batch="chrom9") {
+      select_ids <- c("ENSG00000178031")
+      names(select_ids) <- c("ADAMTSL1")
+    }
     ggp_title <- "Expression Levels of qPCR Target Genes"
   } else if (selection=="bio") {
     stop("selection type",selection,"not yet supported")
@@ -278,6 +288,9 @@ plot_select <- function(dds,wald_res_rank,selection) {
     filename <- paste(batch,cell_line,drop_prnt,quant_tool,mol_type,design,selection,"slx.pdf",sep="_")
   } else {
     filename <- paste(batch,drop_prnt,quant_tool,mol_type,design,selection,"slx.pdf",sep="_")
+  }
+  if (direction=="neg") {
+    filename <- gsub("slx.pdf","neg.pdf",filename)
   }
   count_data <- expr_from_dds_norm(select_ids,dds)
   dat <- dplyr::group_by(count_data, gene_name) %>% summarise(mean=mean(count, na.rm=TRUE)) %>% arrange(desc(mean))
@@ -313,6 +326,7 @@ plot_select <- function(dds,wald_res_rank,selection) {
               axis.text.y=element_text(size=10, face="plain"),
               legend.key=element_rect(fill="white")
             )
+  setwd(plot_dir)
   ggsave(filename=filename,plot=ggp,device="pdf",width=10,height=6,units=c("in"))
 }
 
@@ -321,7 +335,11 @@ examine_select <- function(wald_res_rank,selection) {
   if (selection=="top") {
     select_ids <- head(rownames(wald_res_rank),6)
   } else if (selection=="qpcr") {
-    select_ids <- c("ENSG00000258366", "ENSG00000026036", "ENSG00000125508", "ENSG00000101216", "ENSG00000197457", "ENSG00000101213", "ENSG00000101246", "ENSG00000125520", "ENSG00000203896")
+    if (batch="chrom20") {
+      select_ids <- c("ENSG00000258366", "ENSG00000026036", "ENSG00000125508", "ENSG00000101216", "ENSG00000197457", "ENSG00000101213", "ENSG00000101246", "ENSG00000125520", "ENSG00000203896")
+    } else if (batch="chrom9") {
+      select_ids <- c("ENSG00000178031")
+    }
   } else if (selection=="bio") {
     stop("selection type",selection,"not yet supported")
   }
@@ -357,6 +375,7 @@ ggp <- plot_deseq_res(dds,wald_res)
 fgseaRes <- run_fgsea(wald_res,design)
 ggp <- plot_fgsea(fgseaRes,design)
 ggp <- plot_select(dds,wald_res_rank,"top")
+ggp <- plot_select(dds,wald_res_rank,"top","neg")
 ggp <- plot_select(dds,wald_res_rank,"qpcr")
 # ggp <- plot_select(dds,wald_res_rank,"bio")
 select_res <- examine_select(wald_res_rank,"qpcr")
@@ -372,6 +391,7 @@ ggp <- plot_deseq_res(dds,wald_res)
 fgseaRes <- run_fgsea(wald_res,design)
 ggp <- plot_fgsea(fgseaRes,design)
 ggp <- plot_select(dds,wald_res_rank,"top")
+ggp <- plot_select(dds,wald_res_rank,"top","neg")
 ggp <- plot_select(dds,wald_res_rank,"qpcr")
 # ggp <- plot_select(dds,wald_res_rank,"bio")
 select_res <- examine_select(wald_res_rank,"qpcr")
