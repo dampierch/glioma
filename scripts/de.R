@@ -132,13 +132,20 @@ get_deseq_res <- function(dds,design,fc=1,alpha=0.05) {
       return(list(wald_res,wald_res_rank))
     } else {
       wald_res <- results(dds, lfcThreshold=log2(fc), altHypothesis="greaterAbs", alpha=alpha)
-      wald_res$symbol <- mapIds(org.Hs.eg.db, keys=base::substr(row.names(wald_res),start=1,stop=15), column=c("SYMBOL"), keytype=c("ENSEMBL"), multiVals=c("first"))
-      wald_res$entrez <- mapIds(org.Hs.eg.db, keys=base::substr(row.names(wald_res),start=1,stop=15), column=c("ENTREZID"), keytype=c("ENSEMBL"), multiVals=c("first"))
-      wald_res <- wald_res[ , c(7,8,1:6)]
+      if (mol_type=="tx") {
+        wald_res$ensembl <- mapIds(org.Hs.eg.db, keys=base::substr(row.names(wald_res),start=1,stop=15), column=c("ENSEMBL"), keytype=c("ENSEMBLTRANS"), multiVals=c("first"))
+        wald_res$symbol <- mapIds(org.Hs.eg.db, keys=base::substr(row.names(wald_res),start=1,stop=15), column=c("SYMBOL"), keytype=c("ENSEMBLTRANS"), multiVals=c("first"))
+        wald_res$entrez <- mapIds(org.Hs.eg.db, keys=base::substr(row.names(wald_res),start=1,stop=15), column=c("ENTREZID"), keytype=c("ENSEMBLTRANS"), multiVals=c("first"))
+        wald_res <- wald_res[ , c(7,8,9,1:6)]
+      } else if (mol_type=="ge") {
+        wald_res$symbol <- mapIds(org.Hs.eg.db, keys=base::substr(row.names(wald_res),start=1,stop=15), column=c("SYMBOL"), keytype=c("ENSEMBL"), multiVals=c("first"))
+        wald_res$entrez <- mapIds(org.Hs.eg.db, keys=base::substr(row.names(wald_res),start=1,stop=15), column=c("ENTREZID"), keytype=c("ENSEMBL"), multiVals=c("first"))
+        wald_res <- wald_res[ , c(7,8,1:6)]
+      }
       wald_res_rank <- wald_res[order(wald_res$padj), ]
       wald_res_rank$rank <- seq(1,nrow(wald_res_rank))
       summary(wald_res)
-      cat(paste("Total DEG for",paste(batch,cell_line,drop_prnt,quant_tool,mol_type,paste0(design,":")),sum(wald_res$padj < alpha, na.rm=TRUE),"\n\n"))
+      cat(paste("Total DEF for",paste(batch,cell_line,drop_prnt,quant_tool,mol_type,paste0(design,":")),sum(wald_res$padj < alpha, na.rm=TRUE),"\n\n"))
       print(wald_res_rank[1:5,c("symbol","padj")])
       save(wald_res, file=filename)
       setwd(table_dir)
@@ -272,10 +279,16 @@ plot_select <- function(dds,wald_res_rank,selection,direction="any") {
     select_ids <- head(rownames(wald_res_rank),6)
     names(select_ids) <- head(wald_res_rank$symbol,6)
   } else if (selection=="qpcr") {
-    if (batch="chrom20") {
+    if (batch=="chrom20") {
       select_ids <- c("ENSG00000258366", "ENSG00000026036", "ENSG00000125508", "ENSG00000101216", "ENSG00000197457", "ENSG00000101213", "ENSG00000101246", "ENSG00000125520", "ENSG00000203896")
       names(select_ids) <- c("RTEL1", "RTEL1-TNFRSF6B", "SRMS", "GMEB2", "STMN3", "PTK6", "ARFRP1", "SLC2A4RG", "LIME1")
-    } else if (batch="chrom9") {
+      if (mol_type=="tx") {
+        select_ids <- c("ENST00000370018", "ENST00000360203", "ENST00000508582", "ENST00000318100", "ENST00000356810", "ENST00000425905", "ENST00000646389", "ENST00000482936", "ENST00000496816", "ENST00000469728", "ENST00000488316", "ENST00000463361", "ENST00000370003", "ENST00000647249", "ENST00000645309")
+        # names(select_ids) <- c("RTEL1-205", "RTEL1-203", "RTEL1-212", "RTEL1-201", "RTEL1-202", "RTEL1-206", "RTEL1-214", "RTEL1-209", "RTEL1-211", "RTEL1-208", "RTEL1-210", "RTEL1-207", "RTEL1-204", "RTEL1-215", "RTEL1-213")
+        select_ids <- c(select_ids, "ENST00000266068", "ENST00000370077", "ENST00000370069")
+        names(select_ids) <- c("RTEL1-205", "RTEL1-203", "RTEL1-212", "RTEL1-201", "RTEL1-202", "RTEL1-206", "RTEL1-214", "RTEL1-209", "RTEL1-211", "RTEL1-208", "RTEL1-210", "RTEL1-207", "RTEL1-204", "RTEL1-215", "RTEL1-213", "GMEB2-201", "GMEB2-203", "GMEB2-202")
+      }
+    } else if (batch=="chrom9") {
       select_ids <- c("ENSG00000178031")
       names(select_ids) <- c("ADAMTSL1")
     }
@@ -335,9 +348,13 @@ examine_select <- function(wald_res_rank,selection) {
   if (selection=="top") {
     select_ids <- head(rownames(wald_res_rank),6)
   } else if (selection=="qpcr") {
-    if (batch="chrom20") {
+    if (batch=="chrom20") {
       select_ids <- c("ENSG00000258366", "ENSG00000026036", "ENSG00000125508", "ENSG00000101216", "ENSG00000197457", "ENSG00000101213", "ENSG00000101246", "ENSG00000125520", "ENSG00000203896")
-    } else if (batch="chrom9") {
+      if (mol_type=="tx") {
+        select_ids <- c("ENST00000370018", "ENST00000360203", "ENST00000508582", "ENST00000318100", "ENST00000356810", "ENST00000425905", "ENST00000646389", "ENST00000482936", "ENST00000496816", "ENST00000469728", "ENST00000488316", "ENST00000463361", "ENST00000370003", "ENST00000647249", "ENST00000645309")
+        select_ids <- c(select_ids, "ENST00000266068", "ENST00000370077", "ENST00000370069")
+      }
+    } else if (batch=="chrom9") {
       select_ids <- c("ENSG00000178031")
     }
   } else if (selection=="bio") {
