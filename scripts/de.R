@@ -268,7 +268,7 @@ plot_fgsea <- function(fgseaRes,design) {
 }
 
 
-plot_select <- function(dds,wald_res_rank,selection,direction="any") {
+plot_select <- function(dds,wald_res_rank,selection,direction="any",custom_id=NULL,custom_sym=NULL) {
   if (selection=="top") {
     if (direction=="neg") {
       wald_res_rank <- wald_res_rank[wald_res_rank$stat < 0 & !is.na(wald_res_rank$symbol),]
@@ -278,6 +278,8 @@ plot_select <- function(dds,wald_res_rank,selection,direction="any") {
     }
     select_ids <- head(rownames(wald_res_rank),6)
     names(select_ids) <- head(wald_res_rank$symbol,6)
+    ggp_width <- 10
+    ggp_height <- 6
   } else if (selection=="qpcr") {
     if (batch=="chrom20") {
       select_ids <- c("ENSG00000258366", "ENSG00000026036", "ENSG00000125508", "ENSG00000101216", "ENSG00000197457", "ENSG00000101213", "ENSG00000101246", "ENSG00000125520", "ENSG00000203896")
@@ -288,14 +290,26 @@ plot_select <- function(dds,wald_res_rank,selection,direction="any") {
         select_ids <- c(select_ids, "ENST00000266068", "ENST00000370077", "ENST00000370069")
         names(select_ids) <- c("RTEL1-205", "RTEL1-203", "RTEL1-212", "RTEL1-201", "RTEL1-202", "RTEL1-206", "RTEL1-214", "RTEL1-209", "RTEL1-211", "RTEL1-208", "RTEL1-210", "RTEL1-207", "RTEL1-204", "RTEL1-215", "RTEL1-213", "GMEB2-201", "GMEB2-203", "GMEB2-202")
       }
+      ggp_width <- 10
+      ggp_height <- 6
     } else if (batch=="chrom9") {
       select_ids <- c("ENSG00000178031")
       names(select_ids) <- c("ADAMTSL1")
+      ggp_width <- 10
+      ggp_height <- 6
     }
     ggp_title <- "Expression Levels of qPCR Target Genes"
   } else if (selection=="bio") {
     stop("selection type",selection,"not yet supported")
     ggp_title <- "Expression Levels of Biologically Relevant Genes"
+    ggp_width <- 10
+    ggp_height <- 6
+  } else if (selection=="custom") {
+    select_ids <- custom_id
+    names(select_ids) <- custom_sym
+    ggp_title <- "Expression Levels of Select Genes"
+    ggp_width <- 4
+    ggp_height <- 4
   }
   if (cell_line!="none") {
     filename <- paste(batch,cell_line,drop_prnt,quant_tool,mol_type,design,selection,"slx.pdf",sep="_")
@@ -340,7 +354,8 @@ plot_select <- function(dds,wald_res_rank,selection,direction="any") {
               legend.key=element_rect(fill="white")
             )
   setwd(plot_dir)
-  ggsave(filename=filename,plot=ggp,device="pdf",width=10,height=6,units=c("in"))
+  ggsave(filename=filename,plot=ggp,device="pdf",width=ggp_width,height=ggp_height,units=c("in"))
+  cat("plot saved to",paste0(plot_dir,filename),"\n")
 }
 
 
@@ -413,6 +428,14 @@ ggp <- plot_select(dds,wald_res_rank,"qpcr")
 # ggp <- plot_select(dds,wald_res_rank,"bio")
 select_res <- examine_select(wald_res_rank,"qpcr")
 
+
+## custom lookup
+target <- c("TPD52L2","ZBTB46")
+wald_res_rank[!is.na(wald_res_rank$symbol) & wald_res_rank$symbol %in% target,]
+ggp <- plot_select(dds,wald_res_rank,"custom",
+        custom_id=c("ENSG00000101150","ENSG00000130584"),
+        custom_sym=c("TPD52L2","ZBTB46")
+      )
 
 
 ################################################################################
