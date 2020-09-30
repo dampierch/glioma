@@ -103,7 +103,7 @@ rule count_prep:
     output:
         'count_prep.flag'
     shell:
-        'sbatch --output=count_prep_{dt}.out {input.sh} {input.R} chrom20 LN229 prdp rsem ge live'
+        'sbatch --output=count_prep_{dt}.out {input.sh} {input.R} chrom20 LN229 prdp rsem tx test'
 
 rule explore_counts:
     input:
@@ -112,7 +112,7 @@ rule explore_counts:
     output:
         'explore_counts.flag'
     shell:
-        'sbatch --output=explore_counts_{dt}.out {input.sh} {input.R} chrom20 U87 prdp rsem ge live'
+        'sbatch --output=explore_counts_{dt}.out {input.sh} {input.R} chrom20 LN229 prdp rsem tx test'
 
 rule diff_expr:
     input:
@@ -121,4 +121,4 @@ rule diff_expr:
     output:
         'de.flag'
     shell:
-        'sbatch --output=diff_expr_{dt}.out {input.sh} {input.R} chrom20 LN229 prdp rsem ge live'
+        'sbatch --output=diff_expr_{dt}.out {input.sh} {input.R} chrom20 U87 prdp rsem tx test'
