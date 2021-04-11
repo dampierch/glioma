@@ -18,7 +18,7 @@ main <- function(args) {
 
     ## set project variables
     pvars <- list()
-    pvars$proj_dir <- "../"
+    pvars$proj_dir <- "../../"
     pvars$data_dir <- paste0(pvars$proj_dir, "data/")
     pvars$data_file <- ifelse(is.na(args[2]), "negatives.tsv", args[2])
     pvars$out_prefix <- ifelse(is.na(args[3]), "neg", args[3])
