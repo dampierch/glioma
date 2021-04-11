@@ -41,20 +41,20 @@ main <- function(args) {
     }
     target <- paste0(pvars$proj_dir, pvars$out_prefix, "_wells.pdf")
     if (pvars$out_prefix == "neg") {
-        ggp_write(ggp[1:12], target, nrow=3, ncol=4, ht=9, wd=12)
+        ggp_write(ggp[5:12], target, nrow=2, ncol=4, ht=6, wd=12)
         ggp_write(
-            ggp[13:22], sub(".pdf", "2.pdf", target), nrow=3, ncol=4,
-            ht=9, wd=12
+            ggp[c(1:4, 13:22)], sub(".pdf", "2.pdf", target),
+            nrow=4, ncol=4, ht=12, wd=12
         )
     } else {
         ggp_write(ggp, target, nrow=1, ncol=2, ht=3, wd=6)
     }
     target <- paste0(pvars$proj_dir, pvars$out_prefix, "_means.pdf")
     if (pvars$out_prefix == "neg") {
-        ggp_write(ggp2[1:12], target, nrow=3, ncol=4, ht=9, wd=12)
+        ggp_write(ggp2[5:12], target, nrow=2, ncol=4, ht=6, wd=12)
         ggp_write(
-            ggp2[13:22], sub(".pdf", "2.pdf", target), nrow=3, ncol=4,
-            ht=9, wd=12
+            ggp2[c(1:4, 13:22)], sub(".pdf", "2.pdf", target),
+            nrow=4, ncol=4, ht=12, wd=12
         )
     } else {
         ggp_write(ggp2, target, nrow=1, ncol=2, ht=3, wd=6)
