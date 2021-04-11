@@ -1,18 +1,23 @@
-# Glioma study by Mourad Ali
+# Glioma Studies
 
-## Luciferase assays
-* boxplots
-* generalized estimating equations
-* chromosome 9
-* chromosome 20
+This repository contains analysis code for molecular assays performed as part of investigations into the mechanisms of glioma risk associated with inherited genetic variants.
+
+## Luciferase Assays
+* Boxplots
+* Generalized estimating equations tests
+* Chromosome 9
+* Chromosome 20
 
 ## RNA-seq
-* samples 1-14 are for chrom9
-* samples 15-28 are for chrom20
+* Samples 1-14 for chrom9
+* Samples 15-28 for chrom20
 * U87 and U118 for chrom9
 * U87 and LN229 for chrom20
-* ignore parental lines
+* Parental lines excluded
 
 ## SNPs
-* chrom20: rs3761124
-* chrom9: rs1537372, rs1537373, and rs1333042
+* Chromosome 20: rs3761124
+* Chromosome 9: rs1537372, rs1537373, and rs1333042
+
+## Publications
+* [Ali et al, 2020](https://onlinelibrary.wiley.com/doi/10.1002/humu.24134)

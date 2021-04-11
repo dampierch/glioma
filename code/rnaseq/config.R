@@ -160,7 +160,7 @@ r_dir <- paste0(work_dir,"rdata/")
 res_dir <- paste0(work_dir,"results/")
 plot_dir <- paste0(res_dir,"plots/")
 table_dir <- paste0(res_dir,"tables/")
-scripts_dir <- "/home/chd5n/projects/glioma/scripts/"
+scripts_dir <- "/home/chd5n/projects/glioma/code/rnaseq/"
 
 ## colors
 setwd(ann_dir)

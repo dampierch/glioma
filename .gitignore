@@ -1,0 +1,7 @@
+logs/
+data/
+code/rnaseq/.snakemake/
+*.flag
+*.out
+*.pdf
+*.tsv

@@ -29,7 +29,7 @@ mol_type <- args[6]
 run_type <- args[7]
 cat("batch",batch,"\n");cat("cell_line",cell_line,"\n");cat("drop_prnt",drop_prnt,"\n")
 cat("quant_tool",quant_tool,"\n");cat("mol_type",mol_type,"\n");cat("run_type",run_type,"\n\n")
-source("~/projects/glioma/scripts/config.R")
+source("~/projects/glioma/code/rnaseq/config.R")
 
 
 ## define functions

@@ -31,7 +31,7 @@ def run_multiqc(in_path,out_path,batch,live):
 ## set stable environmental variables
 ##
 home = os.environ['HOME']
-scripts_dir = home + '/projects/glioma/scripts/'
+scripts_dir = home + '/projects/glioma/code/rnaseq/'
 work_dir = '/scratch/chd5n/glioma/'
 fq_dir = work_dir + 'fastq/'
 fqc_dir = work_dir + 'fqc/'
