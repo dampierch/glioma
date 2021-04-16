@@ -13,8 +13,8 @@ ggp_box <- function(data, jwd=0, jht=0, trans=NA) {
     ggp <- ggplot(data, aes(x=allele, y=rel_lum)) +
         geom_boxplot(outlier.size=-1, width=0.3) +
         stat_summary(
-            fun=mean, geom="point", shape=23, size=5, color=muted("red"),
-            fill=muted("red")
+            fun=mean, geom="point", shape=23, size=5, color="grey40",
+            stroke=1.5
         ) +
         geom_point(
             aes(shape=factor(plate_id)), size=2, alpha=0.5, stroke=1,
