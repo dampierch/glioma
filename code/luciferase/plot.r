@@ -12,10 +12,10 @@ ggp_box <- function(data, jwd=0, jht=0, trans=NA) {
     ggp_shape <- c(16, 15, 17)
     ggp <- ggplot(data, aes(x=allele, y=rel_lum)) +
         geom_boxplot(outlier.size=-1, width=0.3) +
-        stat_summary(
-            fun=mean, geom="point", shape=23, size=5, color="grey40",
-            stroke=1.5
-        ) +
+        #stat_summary(
+        #    fun=mean, geom="point", shape=23, size=5, color="grey40",
+        #    stroke=1.5
+        #) +
         geom_point(
             aes(shape=factor(plate_id)), size=2, alpha=0.5, stroke=1,
             position=position_jitter(width=jwd, height=jht)
